@@ -56,14 +56,22 @@ async function scrollToBottom(page) {
       let dates =[]
       let rates = []
       let cnt = 0
+
+
       const elements = document.querySelectorAll(".border-b > .py-3 > .justify-around > .mx-4 > .text-xs > span ")
       const eusers = document.querySelectorAll(".border-b > .py-3 > .justify-around > .ml-4 > .mx-auto > .my-1")
       const elocations = document.querySelectorAll(".border-b > .py-3 > .justify-around > .mx-4 > .mb-1")
       const edates = document.querySelectorAll(".border-b > .py-3 > .justify-around > .ml-4 > .mx-auto > .text-xs")
-      const erates =document.querySelectorAll(".border-b > .py-3 > .justify-around > .mx-4 > div")
+      const erates =document.querySelectorAll(".border-b > .py-3 > .justify-around")
       for(let element of elements){
         comments = comments.concat(element.innerText)
         cnt++
+      }
+      for(let el of erates){
+
+        const erates = el.querySelectorAll('.mx-4 > div > svg')
+        rates = rates.concat(erates.length)
+        // rates = erates.length
       }
       for(let euser of eusers){
         users = users.concat(euser.innerText)
@@ -74,26 +82,16 @@ async function scrollToBottom(page) {
       for(let edate of edates){
         dates = dates.concat(edate.innerText)
       }
-      for(let erate of edates){
-        // Count child elements within the parent element
-        const childElementCount = await page.evaluate((erates) => {
-        const parentElement = document.querySelector(erates);
-        // Check if the parent element exists and has child elements
-        if (parentElement) {
-        return parentElement.childElementCount; // Return the count of child elements
-        }
-        return 0; // Return 0 if the parent element does not exist
-        }, erates);
-        console.log(`Number of child elements: ${childElementCount}`);
-        }
-        return {users,locations,dates,comments, cnt}
+     
+        return {users,locations,dates,comments, cnt,rates}
 
 
     })
-
+    console.log("Rate",reviewVal.rates);
     console.log(reviewVal);
     console.log(reviewVal.users[0],
       reviewVal.locations[0],
+      reviewVal.rates[0],
       reviewVal.comments[0],
       reviewVal.dates[0]
       );
