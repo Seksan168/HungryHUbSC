@@ -1,4 +1,7 @@
 import puppeteer from "puppeteer";
+import fs from "fs";
+import LanguageDetect from "languagedetect";
+import { log } from "console";
 //Function scroll
 async function scrollToBottom(page) {
   await page.evaluate(async () => {
@@ -8,6 +11,35 @@ async function scrollToBottom(page) {
     }
   });
 }
+const thaimonthStringToNumber= async (month) => {
+  const monthMap = {
+    "ม.ค": 1,
+    "ก.พ.": 2,
+    "มี.ค.": 3,
+    "เม.ย.": 4,
+    "พ.ค.": 5,
+    "มิ.ย.": 6,
+    "ก.ค.": 7,
+    "ส.ค.": 8,
+    "ก.ย.": 9,
+    "ต.ค.": 10,
+    "พ.ย.": 11,
+    "ธ.ค.": 12,
+  };
+
+  return monthMap[month];
+};
+
+
+const checkLng = async (quote) => {
+  if (quote) {
+    const lngDetector = new LanguageDetect();
+    const lng = lngDetector.detect(quote, 1);
+    return lng[0][0];
+  }
+  return "";
+};
+ 
 
 (async () => {
   try {
@@ -48,15 +80,14 @@ async function scrollToBottom(page) {
       console.log(error);
     }
     
-    const reviewVal = await page.evaluate(async() =>{
-
+    const quotes = await page.evaluate(async() =>{
       let users=[]
       let locations = []
       let comments = []
-      let dates =[]
+      let datefulls =[]
+      let dates = []
       let rates = []
       let cnt = 0
-
 
       const elements = document.querySelectorAll(".border-b > .py-3 > .justify-around > .mx-4 > .text-xs > span ")
       const eusers = document.querySelectorAll(".border-b > .py-3 > .justify-around > .ml-4 > .mx-auto > .my-1")
@@ -82,18 +113,31 @@ async function scrollToBottom(page) {
       for(let edate of edates){
         dates = dates.concat(edate.innerText)
       }
+      
+      
      
-        return {users,locations,dates,comments, cnt,rates}
-
-
+      return {users,locations,dates,comments, cnt,rates}
+      
+    
     })
-    console.log("Rate",reviewVal.rates);
-    console.log(reviewVal);
-    console.log(reviewVal.users[0],
-      reviewVal.locations[0],
-      reviewVal.rates[0],
-      reviewVal.comments[0],
-      reviewVal.dates[0]
+    // for(let quote of quotes){
+    //     const datesp = quote
+    //     quotes.datesp = `${dates[2]}-${await monthStringToNumber(dates[1])} -${
+    //       date[2].split(",")[0]}`;
+    //     }
+    let month = 0;
+    month = await thaimonthStringToNumber(quotes.dates[0].split(" ")[1])
+
+    
+    
+    
+    console.log("month",month);
+    console.log(quotes);
+    console.log(quotes.users[0],
+      quotes.locations[0],
+      quotes.rates[0],
+      quotes.comments[0],
+      quotes.dates[0]
       );
     
 

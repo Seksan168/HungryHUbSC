@@ -10,10 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fs": "^0.0.1-security",
+    "languagedetect": "^2.0.0",
     "puppeteer": "^21.10.0"
   },
   "type": "module",
-  "types": "module",
-  "devDependencies": {},
-  "description": ""
+  "types": "module"
 }
