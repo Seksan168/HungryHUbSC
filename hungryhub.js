@@ -35,11 +35,17 @@ const thaimonthStringToNumber= async (month) => {
 const checkLng = async (quote) => {
   if (quote) {
     const lngDetector = new LanguageDetect();
-    const lng = lngDetector.detect(quotes.comments, 1);
-    return lng[0][0];
+    const lng = lngDetector.detect(quote, 1);
+
+    // Check if lng is defined and has elements before accessing its properties
+    if (lng && lng.length > 0 && lng[0][0]) {
+      return lng[0][0];
+    }
   }
   return "";
 };
+
+
 
 
 (async () => {
@@ -136,7 +142,7 @@ const checkLng = async (quote) => {
       data.detail = quotes.comments[i];
       data.rating = quotes.rates[i];
       data.reviewed_on = quotes.dates[i];
-      data.language = "TH";
+      data.language = await checkLng(quotes.comments[i]);
       data.refereance = "Hungryhub";
       data.count = i+1;
       data.push({
@@ -144,7 +150,7 @@ const checkLng = async (quote) => {
         detail:quotes.comments[i],
         rating:quotes.rates[i],
         reviewed_on:quotes.dates[i],
-        language:"TH",
+        language:await checkLng(quotes.comments[i]),
         refereance:"Hungryhub"
     })
     
