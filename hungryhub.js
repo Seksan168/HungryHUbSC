@@ -11,6 +11,7 @@ async function scrollToBottom(page) {
     }
   });
 }
+//Function thaimonthtostring
 const thaimonthStringToNumber= async (month) => {
   const monthMap = {
     "ม.ค": 1,
@@ -30,16 +31,16 @@ const thaimonthStringToNumber= async (month) => {
   return monthMap[month];
 };
 
-
+//Function check lang
 const checkLng = async (quote) => {
   if (quote) {
     const lngDetector = new LanguageDetect();
-    const lng = lngDetector.detect(quote, 1);
+    const lng = lngDetector.detect(quotes.comments, 1);
     return lng[0][0];
   }
   return "";
 };
- 
+
 
 (async () => {
   try {
@@ -117,32 +118,69 @@ const checkLng = async (quote) => {
       
     
     })
+    let data = [];
+
     for (let i = 0; i < quotes.dates.length; i++) {
       const dateParts = quotes.dates[i].split(" ");
       if (dateParts.length === 3) {
-        // Assuming date format is Day Month Year as per the given example
         const day = dateParts[0];
         const month = dateParts[1];
         const year = dateParts[2];
-        // Convert month string to number - ensure thaimonthStringToNumber function is accessible here
         const monthNumber = await thaimonthStringToNumber(month);
-        // Reformat the date string
         quotes.dates[i] = `${year}-${monthNumber}-${day}`;
       }
-    }
-
-  
-    console.log(quotes);
-    console.log(quotes.users[0],
-      quotes.locations[0],
-      quotes.rates[0],
-      quotes.comments[0],
-      quotes.dates[0]
-      );
+      
+      
+      data.storename = quotes.locations[i];
+      data.topic = "";
+      data.detail = quotes.comments[i];
+      data.rating = quotes.rates[i];
+      data.reviewed_on = quotes.dates[i];
+      data.language = "TH";
+      data.refereance = "Hungryhub";
+      data.count = i+1;
+      data.push({
+        storename:quotes.locations[i],topic:"",
+        detail:quotes.comments[i],
+        rating:quotes.rates[i],
+        reviewed_on:quotes.dates[i],
+        language:"TH",
+        refereance:"Hungryhub"
+    })
     
+        // Output each data object
+    }
+    
+    console.log(data); 
 
-  
+
+
+    // console.log(quotes);
+    // console.log(quotes.users[0],
+    //   quotes.locations[0],
+    //   quotes.rates[0],
+    //   quotes.comments[0],
+    //   quotes.dates[0]
+    //   );
+
+
+
     await browser.close();
+
+    let allComments = [];
+    allComments = allComments.concat(quotes);
+    const jsonString = JSON.stringify(data, null, 2);
+    const path = "Tripadvisor-comments.json";
+
+    fs.writeFile(path, jsonString, (err) => {
+      if (err) {
+        console.log("error: ", err);
+        return;
+      }
+      console.log(`data saved to ${path}`);
+    });
+
+    
   } catch (error) {
     console.error("An error occurred:", error);
   }
