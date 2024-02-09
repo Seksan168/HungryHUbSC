@@ -1,7 +1,8 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
 import LanguageDetect from "languagedetect";
-import { log } from "console";
+import {franc}  from "franc"
+
 //Function scroll
 async function scrollToBottom(page) {
   await page.evaluate(async () => {
@@ -34,6 +35,20 @@ const thaimonthStringToNumber= async (month) => {
 //Function check lang
 const checkLng = async (quote) => {
   if (quote) {
+    const lng = franc(quote, { only: ['tha'] });
+
+    if (lng === 'tha') {
+      return 'Thai';
+    } else {
+      // Instead of recursive call, directly return the result of the async call
+      return await checkLngAsync(quote);
+    }
+  }
+  return "";
+};
+
+const checkLngAsync = async (quote) => {
+  if (quote) {
     const lngDetector = new LanguageDetect();
     const lng = lngDetector.detect(quote, 1);
 
@@ -45,9 +60,6 @@ const checkLng = async (quote) => {
   return "";
 };
 
-
-
-
 (async () => {
   try {
     const browser = await puppeteer.launch({
@@ -55,16 +67,13 @@ const checkLng = async (quote) => {
       defaultViewport: null,
     });
     const page = await browser.newPage();
-    await page.goto('https://web.hungryhub.com/restaurants/kindee-bistro-phuket?locale=th', { 
+    await page.goto('https://web.hungryhub.com/restaurants/see-fah-thonglor?locale=th', { 
       waitUntil: "domcontentloaded" 
     });
     await page.setViewport({ 
       width: 1200, height: 800 
     });
     await page.waitForTimeout(8000);
-    
-
-  
     
     // Using scrollToBottom twice, adjust the number of times as needed
     await scrollToBottom(page);
@@ -121,8 +130,7 @@ const checkLng = async (quote) => {
       }
      
       return {users,locations,dates,comments, cnt,rates}
-      
-    
+
     })
     let data = [];
 
@@ -135,7 +143,6 @@ const checkLng = async (quote) => {
         const monthNumber = await thaimonthStringToNumber(month);
         quotes.dates[i] = `${year}-${monthNumber}-${day}`;
       }
-      
       
       data.storename = quotes.locations[i];
       data.topic = "";
@@ -168,15 +175,12 @@ const checkLng = async (quote) => {
     //   quotes.comments[0],
     //   quotes.dates[0]
     //   );
-
-
-
     await browser.close();
 
     let allComments = [];
     allComments = allComments.concat(quotes);
     const jsonString = JSON.stringify(data, null, 2);
-    const path = "Tripadvisor-comments.json";
+    const path = "HungryHub-comments.json";
 
     fs.writeFile(path, jsonString, (err) => {
       if (err) {
