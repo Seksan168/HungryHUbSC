@@ -15,7 +15,7 @@ async function scrollToBottom(page) {
 //Function thaimonthtostring
 const thaimonthStringToNumber= async (month) => {
   const monthMap = {
-    "ม.ค": 1,
+    "ม.ค.": 1,
     "ก.พ.": 2,
     "มี.ค.": 3,
     "เม.ย.": 4,
