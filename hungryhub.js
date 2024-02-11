@@ -2,6 +2,10 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import LanguageDetect from "languagedetect";
 import {franc}  from "franc"
+import { log } from "console";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient()
 
 //Function scroll
 async function scrollToBottom(page) {
@@ -160,7 +164,30 @@ const checkLngAsync = async (quote) => {
         language:await checkLng(quotes.comments[i]),
         refereance:"Hungryhub"
     })
+    const existingRecord = await prisma.review.findFirst({
+      where: {
+        detail: quotes.comments[i],
+      },
+    });
     
+    // Above function is to check whether that comment is already exported to the database, 
+    //Will be True if it does exist otherwise will be false.
+    
+          if (!existingRecord) {
+            await prisma.review.create({
+              data: {
+                organization_id: "65c5a9760b5fff3be7a3afd3",
+                storename: quotes.locations[i],
+                topic: "",
+                detail: quotes.comments[i],
+                rating: quotes.rates[i],
+                review_on: new Date(quotes.dates[i]), // "YYYY-MM-DD"
+                language: await checkLng(quotes.comments[i]),
+                reference: "Hungryhub",
+              },
+            });
+          }
+
         // Output each data object
     }
     
@@ -181,6 +208,10 @@ const checkLngAsync = async (quote) => {
     allComments = allComments.concat(quotes);
     const jsonString = JSON.stringify(data, null, 2);
     const path = "HungryHub-comments.json";
+
+
+    
+
 
     fs.writeFile(path, jsonString, (err) => {
       if (err) {

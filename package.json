@@ -10,11 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.9.1",
     "franc": "^6.2.0",
     "fs": "^0.0.1-security",
     "languagedetect": "^2.0.0",
     "puppeteer": "^21.10.0"
   },
   "type": "module",
-  "types": "module"
+  "types": "module",
+  "devDependencies": {
+    "prisma": "^5.9.1"
+  }
 }
