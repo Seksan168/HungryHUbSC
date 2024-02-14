@@ -14,7 +14,7 @@
     "franc": "^6.2.0",
     "fs": "^0.0.1-security",
     "languagedetect": "^2.0.0",
-    "puppeteer": "^21.10.0",
+    "puppeteer": "^21.11.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },

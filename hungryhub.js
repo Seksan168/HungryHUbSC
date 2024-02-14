@@ -2,7 +2,6 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import LanguageDetect from "languagedetect";
 import {franc}  from "franc"
-import { log } from "console";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()

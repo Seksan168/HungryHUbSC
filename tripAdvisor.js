@@ -95,27 +95,27 @@ const getQuotes = async (url) => {
       quote.reference = "TripAdvisor";
       delete quote.text;
 
-      // const existingRecord = await prisma.reviews.findFirst({
-      //   where: {
-      //     detail: quote.detail,
-      //   },
-      // });
+      const existingRecord = await prisma.reviews.findFirst({
+        where: {
+          detail: quote.detail,
+        },
+      });
 
-      // if (!existingRecord) {
-      //   await prisma.reviews.create({
-      //     data: {
-      //       storename: quote.storename,
-      //       topic: quote.topic,
-      //       detail: quote.detail,
-      //       rating: quote.rating,
-      //       reviewed_on: new Date(quote.reviewed_on),
-      //       language: quote.language,
-      //       refereance: quote.reference,
-      //       db_id: 1,
-      //       db_name: "SEE FAH",
-      //     },
-      //   });
-      // }
+      if (!existingRecord) {
+        await prisma.reviews.create({
+          data: {
+            storename: quote.storename,
+            topic: quote.topic,
+            detail: quote.detail,
+            rating: quote.rating,
+            reviewed_on: new Date(quote.reviewed_on),
+            language: quote.language,
+            refereance: quote.reference,
+            db_id: 1,
+            db_name: "SEE FAH",
+          },
+        });
+      }
     }
 
     data = data.concat(quotes);
