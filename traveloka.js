@@ -5,13 +5,12 @@ import LanguageDetect from "languagedetect";
 import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 
-// Use the StealthPlugin to avoid detection
 puppeteer.use(StealthPlugin());
 
 
 const prisma = new PrismaClient();
 
-// Function to detect language with fallback
+
 const checkLng = async (quote) => {
   if (!quote) return "";
   const lng = franc(quote, { only: ['tha'] });
@@ -66,26 +65,6 @@ async function processQuotes(quotes) {
   }
   return processedQuotes;
 }
-
-async function clickAndScrape(page, maxIterations = 3) {
-    let allQuotes = [];
-    for (let iteration = 0; iteration < maxIterations; iteration++) {
-        const quotes = await scrapePageContent(page);
-        const enhancedQuotes = await processQuotes(quotes); 
-        allQuotes = allQuotes.concat(enhancedQuotes);
-
-        const isButtonDisabled = await page.evaluate(() => {
-            const button = document.querySelector('.r-eqz5dr > .r-obd0qt > .r-13awgt0 > .r-61z16t'); 
-            return button ? button.disabled : true;
-        });
-
-        if (isButtonDisabled) break;
-        await page.click('.r-eqz5dr > .r-obd0qt > .r-13awgt0 > .r-61z16t'); 
-        await page.waitForTimeout(5000); 
-    }
-
-    return allQuotes;
-}
 async function processAndSaveQuotes(quotes) {
     for (const quote of quotes) {
       const language = await checkLng(quote.reviews);
@@ -112,38 +91,48 @@ async function processAndSaveQuotes(quotes) {
         }
     }
   }
+  async function isAriaDisabledTrue(page, selector) {
+    const isDisabled = await page.evaluate((selector) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            const ariaDisabledValue = element.getAttribute('aria-disabled');
+            return ariaDisabledValue === 'true';
+        }
+        return false;
+    }, selector);
 
-
-
+    return isDisabled;
+}
 (async () => {
-    try {
-        const browser = await puppeteer.launch({
-            headless: false, 
-            defaultViewport: null,
-        });
+  try {
+      const browser = await puppeteer.launch({ headless: false, defaultViewport: null });
+      const page = await browser.newPage();
+      await page.goto('https://www.traveloka.com/en-en/hotel/thailand/the-naka-phuket--sha-plus-1000000421770', { waitUntil: 'networkidle0' });
+      const buttonSelector = '.r-eqz5dr > .r-obd0qt > .r-13awgt0 > .r-61z16t'; 
+      let allQuotes = []; 
 
-        const page = await browser.newPage();
-        await page.goto('https://www.traveloka.com/en-en/hotel/thailand/the-naka-phuket--sha-plus-1000000421770', { waitUntil: 'networkidle0' }); // Update URL
+      do {
+          await page.waitForSelector(buttonSelector); 
+          const isDisabled = await isAriaDisabledTrue(page, buttonSelector);
+          if (!isDisabled) {
+              const quotes = await scrapePageContent(page);
+              const processedQuotes = await processQuotes(quotes); 
+              allQuotes = allQuotes.concat(processedQuotes);
+              await page.click(buttonSelector);
+              await page.waitForTimeout(5000); 
+          }
+      } while (!await isAriaDisabledTrue(page, buttonSelector));
 
-        const maxIterations = 3; 
-        const result = await clickAndScrape(page, maxIterations);
-        let allQuotes = await clickAndScrape(page, maxIterations);
-        const quotes = await scrapePageContent(page);
-        await processAndSaveQuotes(quotes);
-
-        console.log('Data:', result);
-        
-        await browser.close();
-        const jsonString = JSON.stringify(allQuotes, null, 2);
-        const path = "Traveloka-comments.json";
-        fs.writeFile(path, jsonString, (err) => {
-            if (err) {
-                console.log("error: ", err);
-                return;
-            }
-            console.log(`Data saved to ${path}`);
-        });
-    } catch (error) {
-        console.error('Error during scraping:', error);
-    }
+      console.log('Data scraping complete.');
+      await browser.close();
+      await processAndSaveQuotes(allQuotes);
+      console.log("Data have been save to database");
+      const jsonString = JSON.stringify(allQuotes, null, 2);
+      fs.writeFile("Traveloka-comments.json", jsonString, err => {
+          if (err) console.log("Error writing file:", err);
+          else console.log(`Data saved to Traveloka-comments.json`);
+      });
+  } catch (error) {
+      console.error('Error during scraping:', error);
+  }
 })();
