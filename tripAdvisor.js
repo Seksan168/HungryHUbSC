@@ -95,27 +95,27 @@ const getQuotes = async (url) => {
       quote.reference = "TripAdvisor";
       delete quote.text;
 
-      const existingRecord = await prisma.reviews.findFirst({
-        where: {
-          detail: quote.detail,
-        },
-      });
+      // const existingRecord = await prisma.reviews.findFirst({
+      //   where: {
+      //     detail: quote.detail,
+      //   },
+      // });
 
-      if (!existingRecord) {
-        await prisma.reviews.create({
-          data: {
-            storename: quote.storename,
-            topic: quote.topic,
-            detail: quote.detail,
-            rating: quote.rating,
-            reviewed_on: new Date(quote.reviewed_on),
-            language: quote.language,
-            refereance: quote.reference,
-            db_id: 1,
-            db_name: "SEE FAH",
-          },
-        });
-      }
+      // if (!existingRecord) {
+      //   await prisma.reviews.create({
+      //     data: {
+      //       storename: quote.storename,
+      //       topic: quote.topic,
+      //       detail: quote.detail,
+      //       rating: quote.rating,
+      //       reviewed_on: new Date(quote.reviewed_on),
+      //       language: quote.language,
+      //       refereance: quote.reference,
+      //       db_id: 1,
+      //       db_name: "SEE FAH",
+      //     },
+      //   });
+      // }
     }
 
     data = data.concat(quotes);
@@ -146,18 +146,18 @@ const main = async () => {
   try {
     let urls = [
       "https://www.tripadvisor.com/Restaurant_Review-g293916-d19858038-Reviews-See_Fah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d6019663-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g304554-d17334800-Reviews-Seefah-Mumbai_Maharashtra.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g644049-d13737678-Reviews-Seefah-Bang_Phli_Samut_Prakan_Province.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d13737609-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d3712622-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g294217-d1322059-Reviews-Seefah_Restaurant-Hong_Kong.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d3713749-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d9841777-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d8546847-Reviews-Seefah-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d3714873-Reviews-Seefah_Restaurant-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d3715437-Reviews-Seefah_Restaurant-Bangkok.html",
-      "https://www.tripadvisor.com/Restaurant_Review-g293916-d3715113-Reviews-Seefah_Restaurant-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d6019663-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g304554-d17334800-Reviews-Seefah-Mumbai_Maharashtra.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g644049-d13737678-Reviews-Seefah-Bang_Phli_Samut_Prakan_Province.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d13737609-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d3712622-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g294217-d1322059-Reviews-Seefah_Restaurant-Hong_Kong.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d3713749-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d9841777-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d8546847-Reviews-Seefah-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d3714873-Reviews-Seefah_Restaurant-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d3715437-Reviews-Seefah_Restaurant-Bangkok.html",
+      // "https://www.tripadvisor.com/Restaurant_Review-g293916-d3715113-Reviews-Seefah_Restaurant-Bangkok.html",
     ];
     let allComments = [];
 

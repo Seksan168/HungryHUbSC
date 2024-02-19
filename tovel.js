@@ -1,40 +1,44 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-puppeteer.use(StealthPlugin());
+(async function scrapeComments() {
+  puppeteer.use(StealthPlugin());
 
-async function isAriaDisabledTrue(page, selector) {
-    const isDisabled = await page.evaluate((selector) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            const ariaDisabledValue = element.getAttribute('aria-disabled');
-            return ariaDisabledValue === 'true';
-        }
-        return false;
-    }, selector);
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://www.skyscanner.co.th/hotels/thailand/ban-kammala-hotels/the-naka-phuket/ht-115499867&locale=en-US');
 
-    return isDisabled;
-}
+  // Clicking to expand all reviews
+  await page.click('.Reviews__cta__3TprB');
 
-// Example usage
-const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-});
-const page = await browser.newPage();
+  // Wait for the reviews to load
+  try {
+    await page.waitForSelector('.ReviewList__item__2TXu7');
 
-await page.goto('https://www.traveloka.com/en-en/hotel/thailand/the-naka-phuket--sha-plus-1000000421770');
-const buttonSelector = '.r-eqz5dr > .r-obd0qt > .r-13awgt0 > .r-61z16t';
+    // Extracting comments
+    const comments = await page.evaluate(() => {
+      const reviewItems = document.querySelectorAll('.ReviewList__item__2TXu7');
+      const commentsArray = [];
 
-let result;
-do {
+      reviewItems.forEach(item => {
+        const reviewOn = item.querySelector('.Review__title__2fnbW').textContent;
+        const reviewDetail = item.querySelector('.Review__body__2eNob').textContent;
+        const rating = item.querySelector('.Rating__starRating__2mgTY').textContent;
 
-    await page.waitForSelector(buttonSelector); // Wait for the button to be available
-    await page.click(buttonSelector);
-    await page.waitForTimeout(5000);
-    result = await isAriaDisabledTrue(page, buttonSelector);
-    console.log('Is aria-disabled="true"?', result);
-} while (!result);
+        commentsArray.push({
+          reviewOn,
+          reviewDetail,
+          rating
+        });
+      });
 
-console.log('Done');
-await browser.close();
+      return commentsArray;
+    });
+
+    console.log('Comments:', comments);
+
+    await browser.close();
+  } catch (error) {
+    console.log("Error:", error);
+  }
+})();
