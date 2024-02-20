@@ -27,42 +27,49 @@ async function scrollToBottom(page) {
         await scrollToBottom(page);
 
         const quotes = await page.evaluate(() => {
-            // // Check if hotel name is available
+            // // // Check if hotel name is available
             const nameElement = document.querySelector('.DesktopLayout_DesktopLayout__nameStars__MGE5Y > h1');
             const hotelName = nameElement ? nameElement.textContent.trim() : null;
             
-            // Select all comment elements
-            const quoteList = document.querySelectorAll("#hotel-reviews-content > div > div:nth-child(4)");
-            // const nicki = document.querySelectorAll("ReviewCardItem_ReviewCardItem__YTU2Y");
-            // console.log(nicki);
-            // for(const comment of nicki){
-            //     console.log("Im here");
-            //     try{
-            //         nickiDate = comment.querySelector("div.ReviewCardItem_ReviewCardItem__guestInfo__YmE1Y > p").textContent;
-            //     }catch(e){
-                    
-            //     }
-            //     console.log(nickiDate);
-            // }
-            const datetest = document.querySelector("#hotel-reviews-content > div > div:nth-child(4) > div > div:nth-child(1) > div.ReviewCardItem_ReviewCardItem__guestInfo__YmE1Y > p").innerText;
-            const datetest2 = document.querySelector("#hotel-reviews-content > div > div:nth-child(4) > div > div:nth-child(2) > div.ReviewCardItem_ReviewCardItem__guestInfo__YmE1Y > p").innerText;
-            const test = document.querySelector("#hotel-reviews-content > div > div:nth-child(4) > div").innerText;
-            return Array.from(quoteList).map((quote) => {
-                // Extract comment details
-                const dates = quote.querySelector("div.ReviewCardItem_ReviewCardItem__guestInfo__YmE1Y > p").innerText;
-                const review = quote.querySelector("div.ReviewCardItem_ReviewCardItem__rightSection__YzZkZ > div.FlexibleText_FlexibleText__NWQ0Y.ReviewCardItem_ReviewCardItem__reviewContent__OWU1N > span").innerText;
-                const rating = quote.querySelector("div.ReviewCardItem_ReviewCardItem__rightSection__YzZkZ > div.ReviewCardItem_ReviewCardItem__dateAndPartner__ZjRjN > div > span").innerText;
+            const boxElement = document.querySelectorAll("div.ReviewCardItem_ReviewCardItem__YTU2Y ");
+            
+            
+            const boxCompress = [];
+
+            boxElement.forEach(element => {
+                const reviewEl = element.querySelector("div.ReviewCardItem_ReviewCardItem__rightSection__YzZkZ > div.ReviewCardItem_ReviewCardItem__reviewContent__OWU1N > span");
+                const reviewText = reviewEl ? reviewEl.innerText : "Review not found";
+            
+                const ratingEl = element.querySelector("span.BpkText_bpk-text__ZjI3M.BpkText_bpk-text--label-1__MWI4N.BpkRating_bpk-rating__value__YzhiN");  
+                const ratingText = ratingEl ? ratingEl.innerText : "Rating not found";
                 
-                return { hotelName, datetest,datetest2,test, dates, review, rating };
+                const dateEl = element.querySelector("div.ReviewCardItem_ReviewCardItem__guestInfo__YmE1Y > p.BpkText_bpk-text__ZjI3M.BpkText_bpk-text--caption__NzU1O.ReviewCardItem_ReviewCardItem__info__YTg5Z");
+                const dateText = dateEl ? dateEl.innerText : "Date not found";
+                
+                
+            
+                boxCompress.push({
+                    hotel: hotelName,
+                    review: reviewText,
+                    language: "XX",
+                    rating: ratingText,
+                    date: dateText,
+                    reference: "Skyscanner",
+                });
             });
             
-        });
-        
-        for (let quote of quotes) {
-            console.log(quote);
-        }
-        
-        // await browser.close();
+                return boxCompress;
+            });
+
+            const number_quotes = quotes.length
+            console.log(number_quotes);
+            // console.log('review: '+ quotes);
+            quotes.forEach(obj => {
+                console.log(obj);
+            });
+            
+            
+    await browser.close();
     } catch (error) {
         console.log("Error:", error);
     }
