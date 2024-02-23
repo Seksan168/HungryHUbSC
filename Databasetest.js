@@ -168,12 +168,11 @@ async function scrollToBottom(page) {
             const language = franc(obj.review);
             obj.language = language;
             try {
-                // Database upload section
                 await prisma.$transaction(async (tx) => {
                     const where = {
                         organization_id: "65c5a9760b5fff3be7a3afd3",
                         storename: obj.hotel,
-                        rating: parseInt(obj.rating), 
+                        rating: parseInt(obj.rating), // Convert rating to integer
                     };
         
                     // Adjust date format if necessary
@@ -205,15 +204,15 @@ async function scrollToBottom(page) {
                                 storename: obj.hotel,
                                 topic: "",
                                 detail: obj.review,
-                                rating: parseInt(obj.rating), 
+                                rating: parseInt(obj.rating), // Convert rating to integer
                                 review_on: where.review_on,
                                 language: obj.language,
-                                reference: "Skyscanner",
+                                reference: "Sk-testDoc",
                             },
                         });
                     }
                 });
-                // console.log("All quotes uploaded successfully.");
+                console.log("All quotes uploaded successfully.");
             } catch (error) {
                 console.error("Error uploading quotes to the database:", error);
             }
@@ -245,14 +244,17 @@ async function scrollToBottom(page) {
         await browser.close();
         //file write section
         const jsonString = JSON.stringify(allQuotes, null, 2);
-        const path = "Skyscanner-comments.json";
+        const path = "SkyTestdocument-comments.json";
         fs.writeFile(path, jsonString, (err) => {
             if (err) {
               console.log("error: ", err);
               return;
             }
             console.log(`data saved to ${path}`);
-        });   
+        });
+          
+          // Database upload section
+
 
 
         
